@@ -18,6 +18,10 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import Stack
+from util import Queue
+from collections import deque
+
 
 class SearchProblem:
     """
@@ -31,6 +35,7 @@ class SearchProblem:
         """
         Returns the start state for the search problem.
         """
+
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -70,33 +75,68 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem: SearchProblem):
-    """
-    Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
+    dfs_stack = Stack()
+    visited = []
+    dfs_stack.push((problem.getStartState(), []))
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-    """
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    while True:
+        node_location, path = dfs_stack.pop()
+        visited.append(node_location)
+        if problem.isGoalState(node_location):
+            return path
+        next_node = problem.getSuccessors(node_location)
+        if next_node:
+            for node in next_node:
+                if node[0] not in visited:
+                    new_path = path + [node[1]]
+                    dfs_stack.push((node[0], new_path))
+
+
+    current_node = problem.getStartState()
+
+bfs_queue = util.Queue()
+
 
 def breadthFirstSearch(problem: SearchProblem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+
+    bfs_queue = Queue()
+    visited = []
+
+    bfs_queue.push((problem.getStartState(), []))
+
+    while True:
+        if bfs_queue.isEmpty():
+            print("queue empty")
+            return []
+
+        node_location, path = bfs_queue.pop()
+
+        visited.append(node_location)
+
+        if problem.isGoalState(node_location):
+            return path
+
+        next_nodes = problem.getSuccessors(node_location)
+
+        if len(next_nodes) > 0:
+            for item in next_nodes:
+                if item[0] not in visited and item[0] not in (state[0] for state in bfs_queue.list):
+                    new_path = path + [item[1]]  # Calculate new path
+                    bfs_queue.push((item[0], new_path))
+
     util.raiseNotDefined()
+
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -104,6 +144,7 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
+
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
